@@ -1,4 +1,4 @@
-import { toHHMMSS } from './utils/timeConverter'
+import { toHHMMSS } from './timeConverter'
 import { AnimeInterface } from './axios'
 
 export const searchResult = (anime: AnimeInterface): string => {
@@ -6,7 +6,5 @@ export const searchResult = (anime: AnimeInterface): string => {
 *${anime.anime}*
 _episode:_ ${anime.episode}
 _at:_ ${toHHMMSS(anime.at)}
-
 `
 }
-// _AniList:_ https://anilist.co/anime/${anime.anilist_id}

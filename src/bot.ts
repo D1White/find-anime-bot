@@ -3,9 +3,9 @@ dotenv.config()
 
 import { Telegraf } from 'telegraf'
 
-import ANSVERS from './ansvers.json'
-import { fetchAnime, AnimeInterface } from './axios'
-import { searchResult } from './markdownAnswer'
+import ANSVERS from './assets/ansvers.json'
+import { fetchAnime, AnimeInterface } from './utils/axios'
+import { searchResult } from './utils/markdownAnswer'
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 

@@ -1,17 +1,17 @@
 import axios from 'axios'
 
 export interface AnimeInterface {
-  filename: String
-  episode: Number
-  from: Number
-  to: Number
-  anilist_id: Number
-  anime: String
+  filename: string
+  episode: number
+  from: number
+  to: number
+  anilist_id: number
+  anime: string
   at: number
-  tokenthumb: String
+  tokenthumb: string
 }
 
-export const fetchAnime = (url: String): Promise<any> => {
+export const fetchAnime = (url: string): Promise<any> => {
   return axios
     .get(`https://trace.moe/api/search?url=${url}`)
     .then((res) => {
