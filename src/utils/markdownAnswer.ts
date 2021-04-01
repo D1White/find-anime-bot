@@ -13,6 +13,7 @@ const escapedMsg = (value: string): string => {
 export const searchResult = (anime: AnimeInterface): string => {
   return `
 *${escapedMsg(anime.title_english)}*
+_original title:_ ${anime.title}
 _episode:_ ${anime.episode}
 _at:_ ${toHHMMSS(anime.at)}
 `

@@ -2,4 +2,4 @@
 /build
 .env
 
-src/assets/video.mp4
+src/assets/*.mp4

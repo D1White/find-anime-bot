@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import fs from 'fs'
+import { URL } from 'node:url'
 import path from 'path'
 
 export interface AnimeInterface {
@@ -13,13 +14,7 @@ export interface AnimeInterface {
   at: number
   tokenthumb: string
   title_english: string
-}
-
-export interface SessionInfoInteface {
-  filename: string
-  tokenthumb: string
-  at: number
-  anilist_id: number
+  title: string
 }
 
 export const fetchAnime = (url: string): Promise<any> => {
@@ -50,14 +45,28 @@ export const animePreview = (sessionInfo: AnimeInterface): Promise<any> => {
         console.log('Error')
       }
 
-      const videoPath = path.resolve(__dirname, '../assets', 'video.mp4')
-      // fs.unlink(videoPath, (err) => {
-      //   if (err) {
-      //     console.log(err)
-      //     return
-      //   }
-      // })
+      const videoPath = path.resolve(__dirname, '../assets', `${sessionInfo.tokenthumb}.mp4`)
       res.data.pipe(fs.createWriteStream(videoPath))
-      console.log('Vide saved')
+      console.log('Video saved')
+    })
+}
+
+export const animePreviewTest = (sessionInfo: AnimeInterface): Promise<any> => {
+  return axios
+    .get(
+      `https://media.trace.moe/video/${sessionInfo.anilist_id}/${encodeURIComponent(
+        sessionInfo.filename
+      )}?t=${sessionInfo.at}&token=${sessionInfo.tokenthumb}&size=l`,
+      { responseType: 'stream' }
+    )
+    .then((res) => {
+      if (!res.data) {
+        console.log('Error')
+      }
+      return res.data
+
+      // const videoPath = path.resolve(__dirname, '../assets', 'video.mp4')
+      // res.data.pipe(fs.createWriteStream(videoPath))
+      // console.log('Vide saved')
     })
 }
