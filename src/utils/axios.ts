@@ -1,8 +1,11 @@
 import axios from 'axios'
 
 import fs from 'fs'
-import { URL } from 'node:url'
 import path from 'path'
+
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
+import ffmpeg from 'fluent-ffmpeg'
+ffmpeg.setFfmpegPath(ffmpegPath)
 
 export interface AnimeInterface {
   filename: string
@@ -48,25 +51,12 @@ export const animePreview = (sessionInfo: AnimeInterface): Promise<any> => {
       const videoPath = path.resolve(__dirname, '../assets', `${sessionInfo.tokenthumb}.mp4`)
       res.data.pipe(fs.createWriteStream(videoPath))
       console.log('Video saved')
-    })
-}
 
-export const animePreviewTest = (sessionInfo: AnimeInterface): Promise<any> => {
-  return axios
-    .get(
-      `https://media.trace.moe/video/${sessionInfo.anilist_id}/${encodeURIComponent(
-        sessionInfo.filename
-      )}?t=${sessionInfo.at}&token=${sessionInfo.tokenthumb}&size=l`,
-      { responseType: 'stream' }
-    )
-    .then((res) => {
-      if (!res.data) {
-        console.log('Error')
-      }
-      return res.data
-
-      // const videoPath = path.resolve(__dirname, '../assets', 'video.mp4')
-      // res.data.pipe(fs.createWriteStream(videoPath))
-      // console.log('Vide saved')
+      var proc = new ffmpeg({ source: `${sessionInfo.tokenthumb}.mp4` }).saveToFile(
+        `${sessionInfo.tokenthumb}.gif`,
+        function (stdout, stderr) {
+          console.log('file has been converted succesfully')
+        }
+      )
     })
 }

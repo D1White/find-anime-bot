@@ -6,15 +6,16 @@ import path from 'path'
 import fs from 'fs'
 
 import ANSVERS from './assets/ansvers.json'
-import { fetchAnime, AnimeInterface, animePreview, animePreviewTest } from './utils/axios'
+import { fetchAnime, AnimeInterface, animePreview } from './utils/axios'
 import { searchResult } from './utils/markdownAnswer'
+import imageParser from './utils/imageParser'
 
 let sessionInfo = null
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
 bot.start((ctx) => ctx.reply(ANSVERS.start))
 bot.help((ctx) => ctx.reply(ANSVERS.help))
-bot.on('photo', (ctx) => {
+bot.on('photo', async (ctx) => {
   const photos = ctx.message.photo
 
   if (!photos) {
@@ -22,31 +23,37 @@ bot.on('photo', (ctx) => {
     return
   }
 
-  bot.telegram.getFileLink(photos[photos.length - 1].file_id).then((data) => {
-    ctx.reply('🔎 I start looking...')
+  const userImageHref = await bot.telegram
+    .getFileLink(photos[photos.length - 1].file_id)
+    .then((data) => data.href)
 
-    const anime = fetchAnime(data.href)
+  await ctx.reply('🔎 I start looking...')
 
-    anime.then((res: AnimeInterface) => {
-      ctx.reply('🤔 Most likely it is')
-      console.log(res)
+  const anime = await fetchAnime(userImageHref)
 
-      if (!res) {
-        ctx.reply('response error')
-        return
-      }
+  await ctx.reply('🤔 Most likely it is')
 
-      sessionInfo = { ...res }
+  if (!anime) {
+    ctx.reply('response error')
+    return
+  }
 
-      ctx.replyWithMarkdownV2(searchResult(res), {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: 'AniList', url: `https://anilist.co/anime/${res.anilist_id}` }],
-            [{ text: 'Get preview', callback_data: 'preview' }],
-          ],
-        },
-      })
-    })
+  sessionInfo = { ...anime }
+
+  const animeImageUrl = await imageParser(anime.anilist_id)
+
+  await ctx.replyWithPhoto({
+    url: animeImageUrl,
+    filename: `${anime.title_english}.png`,
+  })
+
+  await ctx.replyWithMarkdownV2(searchResult(anime), {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: 'AniList', url: `https://anilist.co/anime/${anime.anilist_id}` }],
+        [{ text: 'Get preview', callback_data: 'preview' }],
+      ],
+    },
   })
 })
 
@@ -74,27 +81,6 @@ bot.action('preview', (ctx) => {
   } else {
     ctx.reply('Error, try again')
   }
-})
-
-bot.command('/p', (ctx) => {
-  const ss = {
-    filename: '[Ohys-Raws] One-Punch Man - 02 (TX 1280x720 x264 AAC).mp4',
-    at: 496.16499999999996,
-    tokenthumb: 'ZHp0M4HfwoDadWMwzRL30CRIvw',
-    anilist_id: 21087,
-    episode: 2,
-    from: 0,
-    to: 0,
-    anime: 'string',
-    title_english: 'string',
-    title: 'string',
-  }
-
-  animePreviewTest(ss).then((video) => {
-    const videoPath = path.resolve(__dirname, 'assets', 'video.mp4')
-    // ctx.replyWithVideo({ source: fs.createReadStream(video.pipe(fs.createWriteStream(videoPath))) })
-    ctx.replyWithVideo({ source: fs.createReadStream(video) })
-  })
 })
 
 bot.launch()
