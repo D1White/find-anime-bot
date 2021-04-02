@@ -57,27 +57,11 @@ bot.on('photo', async (ctx) => {
   })
 })
 
-bot.action('preview', (ctx) => {
+bot.action('preview', async (ctx) => {
   if (sessionInfo) {
-    animePreview(sessionInfo).then(() => {
-      const videoPath = path.resolve(__dirname, 'assets', `${sessionInfo.tokenthumb}.mp4`)
-      console.log(videoPath)
+    const videoBufer = await animePreview(sessionInfo)
 
-      // ctx.replyWithVideo({ source: videoPath }).then(() => {
-      //   // fs.unlink(videoPath, (err) => {
-      //   //   if (err) {
-      //   //     console.error(err)
-      //   //     return
-      //   //   }
-      //   //   console.log('Video removed')
-      //   // })
-      //   console.log('Video uploaded')
-      // })
-
-      ctx.telegram.sendVideo(ctx.chat.id, { source: videoPath }).then(() => {
-        console.log('Video uploaded')
-      })
-    })
+    await ctx.replyWithVideo({ source: videoBufer })
   } else {
     ctx.reply('Error, try again')
   }

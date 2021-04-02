@@ -41,22 +41,25 @@ export const animePreview = (sessionInfo: AnimeInterface): Promise<any> => {
       `https://media.trace.moe/video/${sessionInfo.anilist_id}/${encodeURIComponent(
         sessionInfo.filename
       )}?t=${sessionInfo.at}&token=${sessionInfo.tokenthumb}&size=l`,
-      { responseType: 'stream' }
+      { responseType: 'arraybuffer' }
     )
     .then((res) => {
       if (!res.data) {
         console.log('Error')
       }
+      // console.log(res.data)
+      return Buffer.from(res.data)
+      // console.log(fileBuffers)
 
-      const videoPath = path.resolve(__dirname, '../assets', `${sessionInfo.tokenthumb}.mp4`)
-      res.data.pipe(fs.createWriteStream(videoPath))
-      console.log('Video saved')
+      // const videoPath = path.resolve(__dirname, '../assets', `${sessionInfo.tokenthumb}.mp4`)
+      // res.data.pipe(fs.createWriteStream(videoPath))
+      // console.log('Video saved')
 
-      var proc = new ffmpeg({ source: `${sessionInfo.tokenthumb}.mp4` }).saveToFile(
-        `${sessionInfo.tokenthumb}.gif`,
-        function (stdout, stderr) {
-          console.log('file has been converted succesfully')
-        }
-      )
+      // var proc = new ffmpeg({ source: `${sessionInfo.tokenthumb}.mp4` }).saveToFile(
+      //   `${sessionInfo.tokenthumb}.gif`,
+      //   function (stdout, stderr) {
+      //     console.log('file has been converted succesfully')
+      //   }
+      // )
     })
 }
