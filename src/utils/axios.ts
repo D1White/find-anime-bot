@@ -1,12 +1,5 @@
 import axios from 'axios'
 
-import fs from 'fs'
-import path from 'path'
-
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
-import ffmpeg from 'fluent-ffmpeg'
-ffmpeg.setFfmpegPath(ffmpegPath)
-
 export interface AnimeInterface {
   filename: string
   episode: number
@@ -44,22 +37,6 @@ export const animePreview = (sessionInfo: AnimeInterface): Promise<any> => {
       { responseType: 'arraybuffer' }
     )
     .then((res) => {
-      if (!res.data) {
-        console.log('Error')
-      }
-      // console.log(res.data)
       return Buffer.from(res.data)
-      // console.log(fileBuffers)
-
-      // const videoPath = path.resolve(__dirname, '../assets', `${sessionInfo.tokenthumb}.mp4`)
-      // res.data.pipe(fs.createWriteStream(videoPath))
-      // console.log('Video saved')
-
-      // var proc = new ffmpeg({ source: `${sessionInfo.tokenthumb}.mp4` }).saveToFile(
-      //   `${sessionInfo.tokenthumb}.gif`,
-      //   function (stdout, stderr) {
-      //     console.log('file has been converted succesfully')
-      //   }
-      // )
     })
 }
